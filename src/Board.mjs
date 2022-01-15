@@ -8,6 +8,12 @@ export class Board {
   }
 
   toString() {
-    return "TODO";
+    const row = Array(this.width).fill(".");
+    return (
+      Array(this.height)
+        .fill(0)
+        .map(() => row.join(""))
+        .join("\n") + "\n"
+    );
   }
 }
