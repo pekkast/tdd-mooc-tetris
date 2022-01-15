@@ -22,11 +22,20 @@ export class Board {
     this.matrix[this.dropY][this.dropX] = block;
   }
 
+  dropped() {
+    this.dropY = undefined;
+    this.dropX = undefined;
+  }
+
   hasFalling() {
     return typeof this.dropY === "number";
   }
 
   tick() {
+    if (this.dropY + 1 === this.height) {
+      return this.dropped();
+    }
+
     this.matrix[this.dropY + 1][this.dropX] =
       this.matrix[this.dropY][this.dropX];
     this.matrix[this.dropY][this.dropX] = 0;
