@@ -36,6 +36,11 @@ export class Board {
       return this.dropped();
     }
 
+    const nextCell = this.matrix[this.dropY + 1][this.dropX];
+    if (typeof nextCell !== "number") {
+      return this.dropped();
+    }
+
     this.matrix[this.dropY + 1][this.dropX] =
       this.matrix[this.dropY][this.dropX];
     this.matrix[this.dropY][this.dropX] = 0;
