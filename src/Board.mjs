@@ -14,7 +14,7 @@ export class Board {
   }
 
   drop(block) {
-    if (typeof this.dropY === "number") {
+    if (this.hasFalling()) {
       throw new Error("already falling");
     }
     this.dropX = Math.floor(this.width / 2);
@@ -22,10 +22,15 @@ export class Board {
     this.matrix[this.dropY][this.dropX] = block;
   }
 
+  hasFalling() {
+    return typeof this.dropY === "number";
+  }
+
   tick() {
     this.matrix[this.dropY + 1][this.dropX] =
       this.matrix[this.dropY][this.dropX];
     this.matrix[this.dropY][this.dropX] = 0;
+    this.dropY++;
   }
 
   toString() {
