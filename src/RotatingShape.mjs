@@ -9,6 +9,14 @@ export class RotatingShape {
       .map((row) => row.split(""));
   }
 
+  get width() {
+    return this.cells.length;
+  }
+
+  get height() {
+    return this.cells.length;
+  }
+
   rotateRight() {
     const matrix = Array(this.cells.length)
       .fill(0)

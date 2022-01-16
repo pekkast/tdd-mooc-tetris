@@ -4,6 +4,7 @@ export class Board {
   matrix;
   dropX;
   dropY;
+  block;
 
   constructor(width, height) {
     this.width = width;
@@ -19,16 +20,18 @@ export class Board {
     }
     this.dropX = Math.floor(this.width / 2);
     this.dropY = 0;
-    this.matrix[this.dropY][this.dropX] = block;
+    this.block = block;
   }
 
   dropped() {
+    this.matrix[this.dropY][this.dropX] = this.block;
     this.dropY = undefined;
     this.dropX = undefined;
+    this.block = undefined;
   }
 
   hasFalling() {
-    return typeof this.dropY === "number";
+    return typeof this.block !== "undefined";
   }
 
   tick() {
@@ -41,18 +44,21 @@ export class Board {
       return this.dropped();
     }
 
-    this.matrix[this.dropY + 1][this.dropX] =
-      this.matrix[this.dropY][this.dropX];
-    this.matrix[this.dropY][this.dropX] = 0;
     this.dropY++;
   }
 
   toString() {
     return (
       this.matrix
-        .map((row) =>
+        .map((row, y) =>
           row
-            .map((cell) => (typeof cell === "number" ? "." : cell.color))
+            .map((cell, x) =>
+              this.hasFalling() && y === this.dropY && x === this.dropX
+                ? this.block.toString()
+                : typeof cell === "number"
+                ? "."
+                : cell.toString()
+            )
             .join("")
         )
         .join("\n") + "\n"
