@@ -47,15 +47,26 @@ export class Board {
     this.dropY++;
   }
 
+  isBlockCovered(y, x) {
+    return !!this.getBlockPart(y, x);
+  }
+
+  getBlockPart(y, x) {
+    if (!this.hasFalling()) {
+      return undefined;
+    }
+    if (y === this.dropY && x === this.dropX) {
+      return this.block.toString();
+    }
+  }
+
   toString() {
     return (
       this.matrix
         .map((row, y) =>
           row
             .map((cell, x) =>
-              this.hasFalling() && y === this.dropY && x === this.dropX
-                ? this.block.toString()
-                : cell
+              this.isBlockCovered(y, x) ? this.getBlockPart(y, x) : cell
             )
             .join("")
         )
