@@ -1,3 +1,5 @@
+export const EMPTY_CELL = ".";
+
 export class Board {
   width;
   height;
@@ -11,7 +13,7 @@ export class Board {
     this.height = height;
     this.matrix = Array(this.height)
       .fill(0)
-      .map(() => Array(this.width).fill("."));
+      .map(() => Array(this.width).fill(EMPTY_CELL));
   }
 
   drop(block) {
@@ -51,7 +53,7 @@ export class Board {
 
     const nextCell =
       this.matrix[this.dropY + this.getBlockHeight()][this.dropX];
-    if (nextCell !== ".") {
+    if (nextCell !== EMPTY_CELL) {
       return this.dropped();
     }
 
@@ -77,7 +79,8 @@ export class Board {
       return undefined;
     }
 
-    return this.block.charAt(blockY, blockX + half);
+    const char = this.block.charAt(blockY, blockX + half);
+    return char === EMPTY_CELL ? undefined : char;
   }
 
   getBlockHeight() {
@@ -85,7 +88,7 @@ export class Board {
 
     while (left > 1) {
       for (let i = 0; i < this.block.width; i++) {
-        if (this.block.charAt(left - 1, i) !== ".") {
+        if (this.block.charAt(left - 1, i) !== EMPTY_CELL) {
           return left;
         }
       }
