@@ -11,7 +11,7 @@ export class Board {
     this.height = height;
     this.matrix = Array(this.height)
       .fill(0)
-      .map(() => Array(this.width).fill(0));
+      .map(() => Array(this.width).fill("."));
   }
 
   drop(block) {
@@ -40,7 +40,7 @@ export class Board {
     }
 
     const nextCell = this.matrix[this.dropY + 1][this.dropX];
-    if (typeof nextCell !== "number") {
+    if (nextCell !== ".") {
       return this.dropped();
     }
 
@@ -55,9 +55,7 @@ export class Board {
             .map((cell, x) =>
               this.hasFalling() && y === this.dropY && x === this.dropX
                 ? this.block.toString()
-                : typeof cell === "number"
-                ? "."
-                : cell.toString()
+                : cell
             )
             .join("")
         )
