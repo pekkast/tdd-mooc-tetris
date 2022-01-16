@@ -7,6 +7,10 @@ export class Block {
     this.color = color;
   }
 
+  charAt(y, x) {
+    return this.toString();
+  }
+
   toString() {
     return this.color;
   }

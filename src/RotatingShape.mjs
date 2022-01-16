@@ -17,6 +17,10 @@ export class RotatingShape {
     return this.cells.length;
   }
 
+  charAt(y, x) {
+    return this.cells[y][x];
+  }
+
   rotateRight() {
     const matrix = Array(this.cells.length)
       .fill(0)

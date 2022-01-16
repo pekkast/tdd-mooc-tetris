@@ -18,7 +18,7 @@ export class Board {
     if (this.hasFalling()) {
       throw new Error("already falling");
     }
-    this.dropX = Math.floor(this.width / 2);
+    this.dropX = Math.ceil((this.width - block.width) / 2);
     this.dropY = 0;
     this.block = block;
   }
@@ -55,9 +55,18 @@ export class Board {
     if (!this.hasFalling()) {
       return undefined;
     }
-    if (y === this.dropY && x === this.dropX) {
-      return this.block.toString();
+    const blockY = y - this.dropY;
+    if (blockY < 0 || blockY + 1 > this.block.height) {
+      return undefined;
     }
+
+    const blockX = x - this.dropX;
+    const half = Math.floor(this.block.width / 2);
+    if (Math.abs(blockX) > half) {
+      return undefined;
+    }
+
+    return this.block.charAt(blockY, blockX + half);
   }
 
   toString() {

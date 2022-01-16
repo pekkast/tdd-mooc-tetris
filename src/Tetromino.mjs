@@ -19,6 +19,10 @@ export class Tetromino {
     return this.shape.height;
   }
 
+  charAt(y, x) {
+    return this.shape.charAt(y, x);
+  }
+
   clone() {
     return new Tetromino(
       new RotatingShape(this.shape.toString()),
