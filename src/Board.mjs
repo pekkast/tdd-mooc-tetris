@@ -24,7 +24,13 @@ export class Board {
   }
 
   dropped() {
-    this.matrix[this.dropY][this.dropX] = this.block;
+    this.matrix.forEach((row, y) =>
+      row.forEach((_, x) => {
+        if (this.isBlockCovered(y, x)) {
+          this.matrix[y][x] = this.getBlockPart(y, x);
+        }
+      })
+    );
     this.dropY = undefined;
     this.dropX = undefined;
     this.block = undefined;
@@ -35,11 +41,16 @@ export class Board {
   }
 
   tick() {
-    if (this.dropY + 1 === this.height) {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    if (this.blockHitsFloor()) {
       return this.dropped();
     }
 
-    const nextCell = this.matrix[this.dropY + 1][this.dropX];
+    const nextCell =
+      this.matrix[this.dropY + this.getBlockHeight()][this.dropX];
     if (nextCell !== ".") {
       return this.dropped();
     }
@@ -67,6 +78,30 @@ export class Board {
     }
 
     return this.block.charAt(blockY, blockX + half);
+  }
+
+  getBlockHeight() {
+    let left = this.block.height;
+
+    while (left > 1) {
+      for (let i = 0; i < this.block.width; i++) {
+        if (this.block.charAt(left - 1, i) !== ".") {
+          return left;
+        }
+      }
+      left--;
+    }
+
+    return left;
+  }
+
+  blockHitsFloor() {
+    if (!this.hasFalling()) {
+      return false;
+    }
+
+    const blockHeight = this.getBlockHeight();
+    return this.dropY + blockHeight === this.height;
   }
 
   toString() {
