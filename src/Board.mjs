@@ -51,6 +51,10 @@ export class Board {
       return this.dropped();
     }
 
+    if (this.hasBlockBelow()) {
+      return this.dropped();
+    }
+
     this.dropY++;
   }
 
@@ -59,7 +63,7 @@ export class Board {
       return;
     }
 
-    if (this.dropX - Math.floor(this.block.width / 2) <= 0) {
+    if (this.hasBlockerOnLeft()) {
       return;
     }
 
@@ -71,7 +75,7 @@ export class Board {
       return;
     }
 
-    if (this.dropX + Math.ceil(this.block.width / 2) >= this.width) {
+    if (this.hasBlockOnRight()) {
       return;
     }
 
@@ -87,13 +91,114 @@ export class Board {
       return this.dropped();
     }
 
-    const nextCell =
-      this.matrix[this.dropY + this.getBlockHeight()][this.dropX];
-    if (nextCell !== EMPTY_CELL) {
+    if (this.hasBlockBelow()) {
       return this.dropped();
     }
 
     this.dropY++;
+  }
+
+  hasBlockBelow() {
+    return this.getBlockBottomPoints().reduce((hits, { x, y }) => {
+      if (hits) {
+        return true;
+      }
+
+      return this.matrix[y + 1][x] !== EMPTY_CELL;
+    }, false);
+  }
+
+  getBlockBottomPoints() {
+    const points = [];
+    for (
+      let row = this.dropY;
+      row < this.dropY + this.getBlockHeight();
+      row++
+    ) {
+      points.push(...this.getRowBottomPoints(row));
+    }
+    return points;
+  }
+
+  getRowBottomPoints(row) {
+    let col = 0;
+    const points = [];
+
+    while (!this.isBlockCovered(row, col)) {
+      col++;
+    }
+
+    while (this.isBlockCovered(row, col)) {
+      if (!this.isBlockCovered(row + 1, col)) {
+        points.push({ x: col, y: row });
+      }
+      col++;
+    }
+
+    return points;
+  }
+
+  hasBlockerOnLeft() {
+    return this.getBlockSidePoints(this.getRowLeft).reduce((hits, { x, y }) => {
+      if (hits) {
+        return true;
+      }
+
+      if (x === 0) {
+        return true;
+      }
+
+      return this.matrix[y][x - 1] !== EMPTY_CELL;
+    }, false);
+  }
+
+  getRowLeft(row) {
+    let col = 0;
+
+    while (!this.isBlockCovered(row, col)) {
+      col++;
+    }
+
+    return col;
+  }
+
+  hasBlockOnRight() {
+    return this.getBlockSidePoints(this.getRowRight).reduce(
+      (hits, { x, y }) => {
+        if (hits) {
+          return true;
+        }
+
+        if (x + 1 === this.width) {
+          return true;
+        }
+
+        return this.matrix[y][x + 1] !== EMPTY_CELL;
+      },
+      false
+    );
+  }
+
+  getRowRight(row) {
+    let col = this.width - 1;
+
+    while (!this.isBlockCovered(row, col)) {
+      col--;
+    }
+
+    return col;
+  }
+
+  getBlockSidePoints(getX) {
+    const points = [];
+    for (
+      let row = this.dropY;
+      row < this.dropY + this.getBlockHeight();
+      row++
+    ) {
+      points.push({ y: row, x: getX.call(this, row) });
+    }
+    return points;
   }
 
   isBlockCovered(y, x) {
