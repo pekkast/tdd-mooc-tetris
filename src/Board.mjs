@@ -47,10 +47,26 @@ export class Board {
   }
 
   moveLeft() {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    if (this.dropX - Math.floor(this.block.width / 2) <= 0) {
+      return;
+    }
+
     this.dropX--;
   }
 
   moveRight() {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    if (this.dropX + Math.ceil(this.block.width / 2) >= this.width) {
+      return;
+    }
+
     this.dropX++;
   }
 
