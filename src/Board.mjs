@@ -46,6 +46,10 @@ export class Board {
     this.dropX--;
   }
 
+  moveRight() {
+    this.dropX++;
+  }
+
   tick() {
     if (!this.hasFalling()) {
       return;
