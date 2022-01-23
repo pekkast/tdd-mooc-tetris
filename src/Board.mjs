@@ -42,6 +42,10 @@ export class Board {
     return typeof this.block !== "undefined";
   }
 
+  moveLeft() {
+    this.dropX--;
+  }
+
   tick() {
     if (!this.hasFalling()) {
       return;
