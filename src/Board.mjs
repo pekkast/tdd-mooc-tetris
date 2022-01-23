@@ -43,6 +43,14 @@ export class Board {
   }
 
   moveDown() {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    if (this.blockHitsFloor()) {
+      return this.dropped();
+    }
+
     this.dropY++;
   }
 
