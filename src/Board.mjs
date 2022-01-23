@@ -42,6 +42,10 @@ export class Board {
     return typeof this.block !== "undefined";
   }
 
+  moveDown() {
+    this.dropY++;
+  }
+
   moveLeft() {
     this.dropX--;
   }
