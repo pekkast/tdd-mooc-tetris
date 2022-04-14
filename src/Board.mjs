@@ -1,4 +1,5 @@
-export const EMPTY_CELL = ".";
+import { EMPTY_CELL } from "./constants.mjs";
+import { getBlockHeight, getBlockPart, getBlockWidth } from "./utils.mjs";
 
 export class Board {
   width;
@@ -75,11 +76,39 @@ export class Board {
       return;
     }
 
-    if (this.hasBlockOnRight()) {
+    if (this.hasBlockerOnRight()) {
       return;
     }
 
     this.dropX++;
+  }
+
+  rotateLeft() {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    console.log("try", this.block, this.block.toString(), this.toString());
+
+    if (
+      this.hasBlockerOnLeft() &&
+      this.getBlockHeight() > this.getBlockWidth()
+    ) {
+      console.log("blocked");
+      return;
+    }
+
+    console.log("rotate");
+
+    this.block = this.block.rotateLeft();
+  }
+
+  rotateRight() {
+    if (!this.hasFalling()) {
+      return;
+    }
+
+    this.block = this.block.rotateRight();
   }
 
   tick() {
@@ -139,47 +168,37 @@ export class Board {
   }
 
   hasBlockerOnLeft() {
-    return this.getBlockSidePoints(this.getRowLeft).reduce((hits, { x, y }) => {
-      if (hits) {
-        return true;
-      }
-
+    return this.isBlockMovable(this.getBlockLeftOnRow, (x, y) => {
       if (x === 0) {
         return true;
       }
 
       return this.matrix[y][x - 1] !== EMPTY_CELL;
-    }, false);
+    });
   }
 
-  getRowLeft(row) {
+  getBlockLeftOnRow(row) {
     let col = 0;
 
     while (!this.isBlockCovered(row, col)) {
       col++;
     }
 
+    console.log("left", row, col);
     return col;
   }
 
-  hasBlockOnRight() {
-    return this.getBlockSidePoints(this.getRowRight).reduce(
-      (hits, { x, y }) => {
-        if (hits) {
-          return true;
-        }
+  hasBlockerOnRight() {
+    return this.isBlockMovable(this.getBlockRightOnRow, (x, y) => {
+      if (x + 1 === this.width) {
+        return true;
+      }
 
-        if (x + 1 === this.width) {
-          return true;
-        }
-
-        return this.matrix[y][x + 1] !== EMPTY_CELL;
-      },
-      false
-    );
+      return this.matrix[y][x + 1] !== EMPTY_CELL;
+    });
   }
 
-  getRowRight(row) {
+  getBlockRightOnRow(row) {
     let col = this.width - 1;
 
     while (!this.isBlockCovered(row, col)) {
@@ -189,15 +208,28 @@ export class Board {
     return col;
   }
 
+  isBlockMovable(getBlockX, isTouching) {
+    return this.getBlockSidePoints(getBlockX).reduce((hits, { x, y }) => {
+      if (hits) {
+        return true;
+      }
+
+      return isTouching(x, y);
+    }, false);
+  }
+
   getBlockSidePoints(getX) {
     const points = [];
+
     for (
       let row = this.dropY;
       row < this.dropY + this.getBlockHeight();
       row++
     ) {
+      console.log("side", row);
       points.push({ y: row, x: getX.call(this, row) });
     }
+
     return points;
   }
 
@@ -205,38 +237,23 @@ export class Board {
     return !!this.getBlockPart(y, x);
   }
 
-  getBlockPart(y, x) {
+  getBlockPart(row, col) {
     if (!this.hasFalling()) {
       return undefined;
     }
-    const blockY = y - this.dropY;
-    if (blockY < 0 || blockY + 1 > this.block.height) {
-      return undefined;
-    }
 
-    const blockX = x - this.dropX;
-    const half = Math.floor(this.block.width / 2);
-    if (Math.abs(blockX) > half) {
-      return undefined;
-    }
-
-    const char = this.block.charAt(blockY, blockX + half);
-    return char === EMPTY_CELL ? undefined : char;
+    return getBlockPart(this.block, { posX: this.dropX, posY: this.dropY })({
+      row,
+      col,
+    });
   }
 
   getBlockHeight() {
-    let left = this.block.height;
+    return getBlockHeight(this.block);
+  }
 
-    while (left > 1) {
-      for (let i = 0; i < this.block.width; i++) {
-        if (this.block.charAt(left - 1, i) !== EMPTY_CELL) {
-          return left;
-        }
-      }
-      left--;
-    }
-
-    return left;
+  getBlockWidth() {
+    return getBlockWidth(this.block);
   }
 
   blockHitsFloor() {
